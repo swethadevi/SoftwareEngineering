@@ -49,7 +49,7 @@
       },
       style: {
         style: 'Stili',
-        p: 'pe',
+        normal: 'Normale',
         blockquote: 'Citazione',
         pre: 'Codice',
         h1: 'Titolo 1',

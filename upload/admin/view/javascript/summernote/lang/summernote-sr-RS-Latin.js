@@ -48,7 +48,7 @@
       },
       style: {
         style: 'Stil',
-        p: 'pni',
+        normal: 'Normalni',
         blockquote: 'Citat',
         pre: 'Kod',
         h1: 'Zaglavlje 1',

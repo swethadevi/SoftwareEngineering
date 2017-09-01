@@ -3,6 +3,11 @@ class ControllerExtensionModuleInformation extends Controller {
 	public function index() {
 		$this->load->language('extension/module/information');
 
+		$data['heading_title'] = $this->language->get('heading_title');
+
+		$data['text_contact'] = $this->language->get('text_contact');
+		$data['text_sitemap'] = $this->language->get('text_sitemap');
+
 		$this->load->model('catalog/information');
 
 		$data['informations'] = array();

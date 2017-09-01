@@ -57,7 +57,7 @@
       },
       style: {
         style: '样式',
-        p: '普通',
+        normal: '普通',
         blockquote: '引用',
         pre: '代码',
         h1: '标题 1',

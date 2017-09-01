@@ -50,7 +50,7 @@
       },
       style: {
         style: 'Stilius',
-        p: 'pus',
+        normal: 'Normalus',
         blockquote: 'Citata',
         pre: 'Kodas',
         h1: 'Antraštė 1',

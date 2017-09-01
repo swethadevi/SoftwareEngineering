@@ -47,7 +47,7 @@
       },
       style: {
         style: 'Štýl',
-        p: 'Normálny',
+        normal: 'Normálny',
         blockquote: 'Citácia',
         pre: 'Kód',
         h1: 'Nadpis 1',

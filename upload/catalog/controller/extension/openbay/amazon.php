@@ -19,14 +19,14 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
+		$decrypted = $this->openbay->amazon->decryptArgs($this->request->post['data']);
 
 		if (!$decrypted) {
 			$logger->write('amazon/order Failed to decrypt data');
 			return;
 		}
 
-		$order_xml = simplexml_load_string(base64_decode($decrypted));
+		$order_xml = simplexml_load_string($decrypted);
 
 		$amazon_order_status = trim(strtolower((string)$order_xml->Status));
 
@@ -64,7 +64,6 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 
 		/* SKU => ORDER_ITEM_ID */
 		$product_mapping = array();
-		$product_gift_messages = array();
 
 		foreach ($order_xml->Items->Item as $item) {
 
@@ -127,15 +126,6 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			);
 
 			$product_mapping[(string)$item->Sku] = (string)$item->OrderItemId;
-
-			if ($item->GiftMessage != '') {
-				$product_gift_messages[] = (string)$item->Title . ' : ' . (string)$item->GiftMessage;
-			}
-		}
-
-		$order_comment = '';
-		if (count($product_gift_messages) > 0) {
-			$order_comment = $this->language->get('text_gift_message') . '<br />' . implode('<br />', $product_gift_messages);
 		}
 
 		$total = sprintf('%.4f', $this->currency->convert((double)$order_xml->Payment->Amount, $order_currency, $currency_to));
@@ -157,6 +147,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 				'lastname' => '',
 				'email' => (string)$order_xml->Payment->Email,
 				'telephone' => (string)$order_xml->Shipping->Phone,
+				'fax' => '',
 				'newsletter' => '0',
 				'customer_group_id' => $this->config->get('openbay_amazon_order_customer_group'),
 				'password' => '',
@@ -169,6 +160,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 					lastname = '" . $this->db->escape($customer_data['lastname']) . "',
 					email = '" . $this->db->escape($customer_data['email']) . "',
 					telephone = '" . $this->db->escape($customer_data['telephone']) . "',
+					fax = '" . $this->db->escape($customer_data['fax']) . "',
 					newsletter = '" . (int)$customer_data['newsletter'] . "',
 					customer_group_id = '" . (int)$customer_data['customer_group_id'] . "',
 					password = '',
@@ -228,7 +220,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			'payment_code' => 'amazon.amazon',
 			'payment_company_id' => 0,
 			'payment_tax_id' => 0,
-			'comment' => $order_comment,
+			'comment' => '',
 			'total' => $total,
 			'affiliate_id' => '0',
 			'commission' => '0.00',
@@ -242,8 +234,6 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			'accept_language' => '',
 			'products' => $products,
 			'vouchers' => array(),
-			'marketing_id' => 0,
-			'tracking' => 0,
 			'totals' => array(
 				array(
 					'code' => 'sub_total',
@@ -310,7 +300,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 		if($this->config->get('openbay_amazon_notify_admin') == 1){
 			$this->openbay->newOrderAdminNotify($order_id, $order_status);
 		}
-
+		
 		$this->event->trigger('model/checkout/order/addOrderHistory/after', array('model/checkout/order/addOrderHistory/after', array($order_id, $order_status)));
 
 		$logger->write("Ok");
@@ -335,7 +325,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
+		$decrypted = $this->openbay->amazon->decryptArgs($this->request->post['data']);
 
 		if (!$decrypted) {
 			$logger->write('amazon/order Failed to decrypt data');
@@ -375,7 +365,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
+		$decrypted = $this->openbay->amazon->decryptArgs($this->request->post['data']);
 
 		if (!$decrypted) {
 			$logger->write('amazon/listing_reports - Failed to decrypt data');
@@ -430,9 +420,9 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
+		$data = $this->openbay->amazon->decryptArgs($this->request->post['data']);
 
-		if(!$decrypted) {
+		if(!$data) {
 			$logger->write("Error - Failed to decrypt received data.");
 			ob_get_clean();
 			$this->response->setOutput("failed to decrypt");
@@ -440,7 +430,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-		$decoded_data = (array)json_decode($decrypted);
+		$decoded_data = (array)json_decode($data);
 		$logger->write("Received data: " . print_r($decoded_data, true));
 		$status = $decoded_data['status'];
 
@@ -501,7 +491,7 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
+		$decrypted = $this->openbay->amazon->decryptArgs($this->request->post['data']);
 
 		if (!$decrypted) {
 			$logger->write('amazon/search Failed to decrypt data');
@@ -528,14 +518,13 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 
-        $decrypted = $this->openbay->decrypt($this->request->post['data'], $this->openbay->amazon->getEncryptionKey(), $this->openbay->amazon->getEncryptionIv(), false);
-
-		if (!$decrypted) {
+		$data = $this->openbay->amazon->decryptArgs($this->request->post['data']);
+		if (!$data) {
 			$this->response->setOutput("error 003");
 			return;
 		}
 
-		$data_xml = simplexml_load_string(base64_decode($decrypted));
+		$data_xml = simplexml_load_string($data);
 
 		if(!isset($data_xml->action)) {
 			$this->response->setOutput("error 004");
@@ -574,14 +563,14 @@ class ControllerExtensionOpenbayAmazon extends Controller {
 			return;
 		}
 	}
-
+	
 	public function eventAddOrderHistory($route, $data) {
 		$logger = new \Log('amazon.log');
 		$logger->write('eventAddOrderHistory Event fired: ' . $route);
-
+		
 		if (isset($data[0]) && !empty($data[0])) {
 			$this->load->model('extension/openbay/amazon_order');
-
+			
 			$logger->write('Order ID: ' . (int)$data[0]);
 
 			$this->model_extension_openbay_amazon_order->addOrderHistory((int)$data[0]);

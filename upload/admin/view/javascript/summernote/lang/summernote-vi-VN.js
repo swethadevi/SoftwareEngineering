@@ -3,54 +3,54 @@
     'vi-VN': {
       font: {
         bold: 'In Đậm',
-        italic: 'In Nghiêng',
-        underline: 'Gạch dưới',
-        clear: 'Bỏ định dạng',
-        height: 'Chiều cao dòng',
-        name: 'Phông chữ',
-        strikethrough: 'Gạch ngang',
-        size: 'Cỡ chữ'
+        italic: 'In Nghiên',
+        underline: 'Gạch Dưới',
+        clear: 'Bỏ Định Dạng',
+        height: 'Khoảng Cách Hàng',
+        name: 'Phông Chữ',
+        strikethrough: 'Gạch Ngang',
+        size: 'Cỡ Chữ'
       },
       image: {
-        image: 'Hình ảnh',
+        image: 'Hình Ảnh',
         insert: 'Chèn',
         resizeFull: '100%',
         resizeHalf: '50%',
         resizeQuarter: '25%',
-        floatLeft: 'Trôi về trái',
-        floatRight: 'Trôi về phải',
-        floatNone: 'Không trôi',
-        dragImageHere: 'Thả Ảnh ở vùng này',
-        selectFromFiles: 'Chọn từ File',
+        floatLeft: 'Canh Trái',
+        floatRight: 'Canh Phải',
+        floatNone: 'Canh Đều',
+        dragImageHere: 'Thả Ảnh Ở Đây',
+        selectFromFiles: 'Chọn Từ Files',
         url: 'URL',
-        remove: 'Xóa'
+        remove: 'Ghỡ Bỏ'
       },
       video: {
         video: 'Video',
-        videoLink: 'Link đến Video',
+        videoLink: 'Đường Dẫn đến Video',
         insert: 'Chèn Video',
         url: 'URL',
         providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion và Youku)'
       },
       link: {
-        link: 'Link',
-        insert: 'Chèn Link',
-        unlink: 'Gỡ Link',
+        link: 'Đường Dẫn',
+        insert: 'Chèn Đường Dẫn',
+        unlink: 'Ghỡ Đường Dẫn',
         edit: 'Sửa',
-        textToDisplay: 'Văn bản hiển thị',
+        textToDisplay: 'Text Hiển Thị',
         url: 'URL',
-        openInNewWindow: 'Mở ở Cửa sổ mới'
+        openInNewWindow: 'Mở ở Cửa Sổ Mới'
       },
       table: {
         table: 'Bảng'
       },
       hr: {
-        insert: 'Chèn'
+        insert: 'Chèn Vào'
       },
       style: {
-        style: 'Kiểu chữ',
-        p: 'Chữ thường',
-        blockquote: 'Đoạn trích',
+        style: 'Kiểu Chữ',
+        normal: 'Chữ Thường',
+        blockquote: 'Đoạn Trích',
         pre: 'Mã Code',
         h1: 'H1',
         h2: 'H2',
@@ -60,44 +60,44 @@
         h6: 'H6'
       },
       lists: {
-        unordered: 'Liệt kê danh sách',
-        ordered: 'Liệt kê theo thứ tự'
+        unordered: 'Liệt Kê Danh Sách',
+        ordered: 'Liệt Kê Theo Số'
       },
       options: {
-        help: 'Trợ giúp',
-        fullscreen: 'Toàn Màn hình',
-        codeview: 'Xem Code'
+        help: 'Trợ Giúp',
+        fullscreen: 'Đầy Màn Hình',
+        codeview: 'Xem Dạng Code'
       },
       paragraph: {
-        paragraph: 'Canh lề',
-        outdent: 'Dịch sang trái',
-        indent: 'Dịch sang phải',
-        left: 'Canh trái',
-        center: 'Canh giữa',
-        right: 'Canh phải',
-        justify: 'Canh đều'
+        paragraph: 'Canh Lề',
+        outdent: 'Dịch Sang Trái',
+        indent: 'Dịch Sang Phải',
+        left: 'Canh Trái',
+        center: 'Canh Giữa',
+        right: 'Canh Phải',
+        justify: 'Canh Đều'
       },
       color: {
-        recent: 'Màu chữ',
-        more: 'Mở rộng',
-        background: 'Màu nền',
-        foreground: 'Màu chữ',
-        transparent: 'trong suốt',
-        setTransparent: 'Nền trong suốt',
-        reset: 'Thiết lập lại',
-        resetToDefault: 'Trở lại ban đầu'
+        recent: 'Màu Chữ',
+        more: 'Mở Rộng',
+        background: 'Màu Nền',
+        foreground: 'Màu Chữ',
+        transparent: 'Trong Suốt',
+        setTransparent: 'Nền Trong Suốt',
+        reset: 'Thiệt Lập Lại',
+        resetToDefault: 'Trở Lại Ban Đầu'
       },
       shortcut: {
-        shortcuts: 'Phím tắt',
+        shortcuts: 'Phím Tắt',
         close: 'Đóng',
-        textFormatting: 'Định dạng Văn bản',
-        action: 'Hành động',
-        paragraphFormatting: 'Định dạng',
-        documentStyle: 'Kiểu văn bản'
+        textFormatting: 'Định Dạng Văn Bản',
+        action: 'Hành Động',
+        paragraphFormatting: 'Định Dạng',
+        documentStyle: 'Kiểu Văn Bản'
       },
       history: {
-        undo: 'Lùi lại',
-        redo: 'Làm lại'
+        undo: 'Lùi Lại',
+        redo: 'Làm Lại'
       }
     }
   });

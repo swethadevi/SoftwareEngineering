@@ -49,7 +49,7 @@
       },
       style: {
         style: 'Stil',
-        p: 'p',
+        normal: 'Normal',
         blockquote: 'Citat',
         pre: 'Kod',
         h1: 'Rubrik 1',

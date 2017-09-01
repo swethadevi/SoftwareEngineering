@@ -1,12 +1,12 @@
 /**
- * Super simple wysiwyg editor v0.8.2
+ * Super simple wysiwyg editor v0.8.1
  * http://summernote.org/
  *
  * summernote.js
- * Copyright 2013-2016 Alan Hong. and other contributors
+ * Copyright 2013-2015 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2016-08-07T05:11Z
+ * Date: 2016-02-15T18:35Z
  */
 (function (factory) {
   /* global define */
@@ -140,35 +140,6 @@
       }).join('');
     };
 
-    /**
-     * Returns a function, that, as long as it continues to be invoked, will not
-     * be triggered. The function will be called after it stops being called for
-     * N milliseconds. If `immediate` is passed, trigger the function on the
-     * leading edge, instead of the trailing.
-     * @param {Function} func
-     * @param {Number} wait
-     * @param {Boolean} immediate
-     * @return {Function}
-     */
-    var debounce = function (func, wait, immediate) {
-      var timeout;
-      return function () {
-        var context = this, args = arguments;
-        var later = function () {
-          timeout = null;
-          if (!immediate) {
-            func.apply(context, args);
-          }
-        };
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) {
-          func.apply(context, args);
-        }
-      };
-    };
-
     return {
       eq: eq,
       eq2: eq2,
@@ -182,8 +153,7 @@
       uniqueId: uniqueId,
       rect2bnd: rect2bnd,
       invertObject: invertObject,
-      namespaceToCamel: namespaceToCamel,
-      debounce: debounce
+      namespaceToCamel: namespaceToCamel
     };
   })();
 
@@ -324,7 +294,7 @@
     };
   
     /**
-     * returns a copy of the array with all false values removed
+     * returns a copy of the array with all falsy values removed
      *
      * @param {Array} array - array
      * @param {Function} fn - predicate function for cluster rule
@@ -424,18 +394,18 @@
   var isEdge = /Edge\/\d+/.test(userAgent);
 
   var hasCodeMirror = !!window.CodeMirror;
-  if (!hasCodeMirror && isSupportAmd && typeof require !== 'undefined') {
-    if (typeof require.resolve !== 'undefined') {
+  if (!hasCodeMirror && isSupportAmd && require) {
+    if (require.hasOwnProperty('resolve')) {
       try {
         // If CodeMirror can't be resolved, `require.resolve` will throw an
         // exception and `hasCodeMirror` won't be set to `true`.
         require.resolve('codemirror');
         hasCodeMirror = true;
       } catch (e) {
-        // Do nothing.
+        hasCodeMirror = false;
       }
-    } else if (typeof eval('require').specified !== 'undefined') {
-      hasCodeMirror = eval('require').specified('codemirror');
+    } else if (require.hasOwnProperty('specified')) {
+      hasCodeMirror = require.specified('codemirror');
     }
   }
 
@@ -571,16 +541,13 @@
 
     var isTable = makePredByNodeName('TABLE');
 
-    var isData = makePredByNodeName('DATA');
-
     var isInline = function (node) {
       return !isBodyContainer(node) &&
              !isList(node) &&
              !isHr(node) &&
              !isPara(node) &&
              !isTable(node) &&
-             !isBlockquote(node) &&
-             !isData(node);
+             !isBlockquote(node);
     };
 
     var isList = function (node) {
@@ -662,13 +629,8 @@
       if (isText(node)) {
         return node.nodeValue.length;
       }
-      
-      if (node) {
-        return node.childNodes.length;
-      }
-      
-      return 0;
-      
+
+      return node.childNodes.length;
     };
 
     /**
@@ -940,9 +902,6 @@
      * @return {Boolean}
      */
     var isRightEdgeOf = function (node, ancestor) {
-      if (!ancestor) {
-        return false;
-      }
       while (node && node !== ancestor) {
         if (position(node) !== nodeLength(node.parentNode) - 1) {
           return false;
@@ -1065,7 +1024,7 @@
 
     /**
      * returns whether point is visible (can set cursor) or not.
-     *
+     * 
      * @param {BoundaryPoint} point
      * @return {Boolean}
      */
@@ -1481,7 +1440,6 @@
       isPre: isPre,
       isList: isList,
       isTable: isTable,
-      isData: isData,
       isCell: isCell,
       isBlockquote: isBlockquote,
       isBodyContainer: isBodyContainer,
@@ -1772,7 +1730,6 @@
 
       options = $.extend({}, $.summernote.options, options);
       options.langInfo = $.extend(true, {}, $.summernote.lang['en-US'], $.summernote.lang[options.lang]);
-      options.icons = $.extend(true, {}, $.summernote.options.icons, options.icons);
 
       this.each(function (idx, note) {
         var $note = $(note);
@@ -1875,7 +1832,7 @@
   var airEditable = renderer.create('<div class="note-editable" contentEditable="true"/>');
 
   var buttonGroup = renderer.create('<div class="note-btn-group btn-group">');
-  var button = renderer.create('<button type="button" class="note-btn btn btn-default btn-sm" tabindex="-1">', function ($node, options) {
+  var button = renderer.create('<button type="button" class="note-btn btn btn-default btn-sm">', function ($node, options) {
     if (options && options.tooltip) {
       $node.attr({
         title: options.tooltip
@@ -2727,10 +2684,8 @@
       this.isOnList = makeIsOn(dom.isList);
       // isOnAnchor: judge whether range is on anchor node or not
       this.isOnAnchor = makeIsOn(dom.isAnchor);
-      // isOnCell: judge whether range is on cell node or not
+      // isOnAnchor: judge whether range is on cell node or not
       this.isOnCell = makeIsOn(dom.isCell);
-      // isOnData: judge whether range is on data node or not
-      this.isOnData = makeIsOn(dom.isData);
 
       /**
        * @param {Function} pred
@@ -3789,12 +3744,8 @@
         }
         context.triggerEvent('keydown', event);
 
-        if (!event.isDefaultPrevented()) {
-          if (options.shortcuts) {
-            self.handleKeyMap(event);
-          } else {
-            self.preventDefaultEditableShortCuts(event);
-          }
+        if (options.shortcuts && !event.isDefaultPrevented()) {
+          self.handleKeyMap(event);
         }
       }).on('keyup', function (event) {
         context.triggerEvent('keyup', event);
@@ -3818,9 +3769,9 @@
       // [workaround] IE doesn't have input events for contentEditable
       // - see: https://goo.gl/4bfIvA
       var changeEventName = agent.isMSIE ? 'DOMCharacterDataModified DOMSubtreeModified DOMNodeInserted' : 'input';
-      $editable.on(changeEventName, func.debounce(function () {
+      $editable.on(changeEventName, function () {
         context.triggerEvent('change', $editable.html());
-      }, 250));
+      });
 
       $editor.on('focusin', function (event) {
         context.triggerEvent('focusin', event);
@@ -3828,19 +3779,14 @@
         context.triggerEvent('focusout', event);
       });
 
-      if (!options.airMode) {
-        if (options.width) {
-          $editor.outerWidth(options.width);
-        }
-        if (options.height) {
-          $editable.outerHeight(options.height);
-        }
-        if (options.maxHeight) {
-          $editable.css('max-height', options.maxHeight);
-        }
-        if (options.minHeight) {
-          $editable.css('min-height', options.minHeight);
-        }
+      if (!options.airMode && options.height) {
+        this.setHeight(options.height);
+      }
+      if (!options.airMode && options.maxHeight) {
+        $editable.css('max-height', options.maxHeight);
+      }
+      if (!options.airMode && options.minHeight) {
+        $editable.css('min-height', options.minHeight);
       }
 
       history.recordUndo();
@@ -3869,14 +3815,6 @@
         context.invoke(eventName);
       } else if (key.isEdit(event.keyCode)) {
         this.afterCommand();
-      }
-    };
-
-    this.preventDefaultEditableShortCuts = function (event) {
-      // B(Bold, 66) / I(Italic, 73) / U(Underline, 85)
-      if ((event.ctrlKey || event.metaKey) &&
-        list.contains([66, 73, 85], event.keyCode)) {
-        event.preventDefault();
       }
     };
 
@@ -4317,11 +4255,6 @@
       var rng = linkInfo.range || this.createRange();
       var isTextChanged = rng.toString() !== linkText;
 
-      // handle spaced urls from input
-      if (typeof linkUrl === 'string') {
-        linkUrl = linkUrl.trim();
-      }
-
       if (options.onCreateLink) {
         linkUrl = options.onCreateLink(linkUrl);
       }
@@ -4340,10 +4273,6 @@
       }
 
       $.each(anchors, function (idx, anchor) {
-        // if url doesn't match an URL schema, set http:// as default
-        linkUrl = /^[A-Za-z][A-Za-z0-9+-.]*\:[\/\/]?/.test(linkUrl) ?
-          linkUrl : 'http://' + linkUrl;
-
         $(anchor).attr('href', linkUrl);
         if (isNewWindow) {
           $(anchor).attr('target', '_blank');
@@ -4501,6 +4430,13 @@
     this.empty = function () {
       context.invoke('code', dom.emptyPara);
     };
+
+    /**
+     * set height for editable
+     */
+    this.setHeight = function (height) {
+      $editable.outerHeight(height);
+    };
   };
 
   var Clipboard = function (context) {
@@ -4532,7 +4468,7 @@
       //  - IE11 and Firefox: CTRL+v hook
       //  - Webkit: event.clipboardData
       if (this.needKeydownHook()) {
-        this.$paste = $('<div tabindex="-1" />').attr('contenteditable', true).css({
+        this.$paste = $('<div />').attr('contenteditable', true).css({
           position: 'absolute',
           left: -100000,
           opacity: 0
@@ -4607,7 +4543,6 @@
     var $editable = context.layoutInfo.editable;
     var options = context.options;
     var lang = options.langInfo;
-    var documentEventHandlers = {};
 
     var $dropzone = $([
       '<div class="note-dropzone">',
@@ -4615,23 +4550,15 @@
       '</div>'
     ].join('')).prependTo($editor);
 
-    var detachDocumentEvent = function () {
-      Object.keys(documentEventHandlers).forEach(function (key) {
-        $document.off(key.substr(2).toLowerCase(), documentEventHandlers[key]);
-      });
-      documentEventHandlers = {};
-    };
-
     /**
      * attach Drag and Drop Events
      */
     this.initialize = function () {
       if (options.disableDragAndDrop) {
         // prevent default drop event
-        documentEventHandlers.onDrop = function (e) {
+        $document.on('drop', function (e) {
           e.preventDefault();
-        };
-        $document.on('drop', documentEventHandlers.onDrop);
+        });
       } else {
         this.attachDragAndDropEvent();
       }
@@ -4644,7 +4571,9 @@
       var collection = $(),
           $dropzoneMessage = $dropzone.find('.note-dropzone-message');
 
-      documentEventHandlers.onDragenter = function (e) {
+      // show dropzone on dragenter when dragging a object to document
+      // -but only if the editor is visible, i.e. has a positive width and height
+      $document.on('dragenter', function (e) {
         var isCodeview = context.invoke('codeview.isActivated');
         var hasEditorSize = $editor.width() > 0 && $editor.height() > 0;
         if (!isCodeview && !collection.length && hasEditorSize) {
@@ -4654,25 +4583,15 @@
           $dropzoneMessage.text(lang.image.dragImageHere);
         }
         collection = collection.add(e.target);
-      };
-
-      documentEventHandlers.onDragleave = function (e) {
+      }).on('dragleave', function (e) {
         collection = collection.not(e.target);
         if (!collection.length) {
           $editor.removeClass('dragover');
         }
-      };
-
-      documentEventHandlers.onDrop = function () {
+      }).on('drop', function () {
         collection = $();
         $editor.removeClass('dragover');
-      };
-
-      // show dropzone on dragenter when dragging a object to document
-      // -but only if the editor is visible, i.e. has a positive width and height
-      $document.on('dragenter', documentEventHandlers.onDragenter)
-        .on('dragleave', documentEventHandlers.onDragleave)
-        .on('drop', documentEventHandlers.onDrop);
+      });
 
       // change dropzone's message on hover.
       $dropzone.on('dragenter', function () {
@@ -4705,10 +4624,6 @@
           });
         }
       }).on('dragover', false); // prevent default dragover event
-    };
-
-    this.destroy = function () {
-      detachDocumentEvent();
     };
   };
 
@@ -4769,15 +4684,6 @@
       context.invoke('toolbar.updateCodeview', true);
       $editor.addClass('codeview');
       $codable.focus();
-      
-      $codable.on('input', function(e) {
-        var value = dom.value($codable, options.prettifyHtml) || dom.emptyPara;
-        var isChange = $editable.html() !== value;
-        $editable.html(value);
-        if (isChange) {
-         context.triggerEvent('change', $editable.html(), $editable);
-        }
-      });
 
       // activate CodeMirror as codable
       if (agent.hasCodeMirror) {
@@ -4866,7 +4772,6 @@
 
     this.destroy = function () {
       $statusbar.off();
-      $statusbar.remove();
     };
   };
 
@@ -5033,7 +4938,7 @@
   var AutoLink = function (context) {
     var self = this;
     var defaultScheme = 'http://';
-    var linkPattern = /^([A-Za-z][A-Za-z0-9+-.]*\:[\/\/]?|mailto:[A-Z0-9._%+-]+@)?(www\.)?(.+)$/i;
+    var linkPattern = /^(https?:\/\/|ssh:\/\/|ftp:\/\/|file:\/|mailto:[A-Z0-9._%+-]+@)?(www\.)?(.+)$/i;
 
     this.events = {
       'summernote.keyup': function (we, e) {
@@ -5151,10 +5056,6 @@
 
     var representShortcut = this.representShortcut = function (editorMethod) {
       var shortcut = invertedKeyMap[editorMethod];
-      if (!options.shortcuts || !shortcut) {
-        return '';
-      }
-      
       if (agent.isMac) {
         shortcut = shortcut.replace('CMD', '⌘').replace('SHIFT', '⇧');
       }
@@ -5204,13 +5105,13 @@
             template: function (item) {
 
               if (typeof item === 'string') {
-                item = { tag: item, title: (lang.style.hasOwnProperty(item) ? lang.style[item] : item) };
+                item = { tag: item, title: item };
               }
 
               var tag = item.tag;
               var title = item.title;
               var style = item.style ? ' style="' + item.style + '" ' : '';
-              var className = item.className ? ' class="' + item.className + '"' : '';
+              var className = item.className ? ' className="' + item.className + '"' : '';
 
               return '<' + tag + style + className + '>' + title + '</' + tag +  '>';
             },
@@ -5540,7 +5441,7 @@
       context.memo('button.link', function () {
         return ui.button({
           contents: ui.icon(options.icons.link),
-          tooltip: lang.link.link + representShortcut('linkDialog.show'),
+          tooltip: lang.link.link,
           click: context.createInvokeHandler('linkDialog.show')
         }).render();
       });
@@ -5938,13 +5839,6 @@
     };
 
     /**
-     * toggle update button
-     */
-    this.toggleLinkBtn = function ($linkBtn, $linkText, $linkUrl) {
-      ui.toggleBtn($linkBtn, $linkText.val() && $linkUrl.val());
-    };
-
-    /**
      * Show link dialog and set event handlers on dialog controls.
      *
      * @param {Object} linkInfo
@@ -5960,38 +5854,30 @@
         ui.onDialogShown(self.$dialog, function () {
           context.triggerEvent('dialog.shown');
 
-          // if no url was given, copy text to url
-          if (!linkInfo.url) {
-            linkInfo.url = linkInfo.text;
-          }
-
           $linkText.val(linkInfo.text);
 
-          var handleLinkTextUpdate = function () {
-            self.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
+          $linkText.on('input', function () {
+            ui.toggleBtn($linkBtn, $linkText.val() && $linkUrl.val());
             // if linktext was modified by keyup,
             // stop cloning text from linkUrl
             linkInfo.text = $linkText.val();
-          };
-
-          $linkText.on('input', handleLinkTextUpdate).on('paste', function () {
-            setTimeout(handleLinkTextUpdate, 0);
           });
 
-          var handleLinkUrlUpdate = function () {
-            self.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
+          // if no url was given, copy text to url
+          if (!linkInfo.url) {
+            linkInfo.url = linkInfo.text || 'http://';
+            ui.toggleBtn($linkBtn, linkInfo.text);
+          }
+
+          $linkUrl.on('input', function () {
+            ui.toggleBtn($linkBtn, $linkText.val() && $linkUrl.val());
             // display same link on `Text to display` input
             // when create a new link
             if (!linkInfo.text) {
               $linkText.val($linkUrl.val());
             }
-          };
-
-          $linkUrl.on('input', handleLinkUrlUpdate).on('paste', function () {
-            setTimeout(handleLinkUrlUpdate, 0);
           }).val(linkInfo.url).trigger('focus');
 
-          self.toggleLinkBtn($linkBtn, $linkText, $linkUrl);
           self.bindEnterKey($linkUrl, $linkBtn);
           self.bindEnterKey($linkText, $linkBtn);
 
@@ -6012,8 +5898,8 @@
 
         ui.onDialogHidden(self.$dialog, function () {
           // detach events
-          $linkText.off('input paste keypress');
-          $linkUrl.off('input paste keypress');
+          $linkText.off('input keypress');
+          $linkUrl.off('input keypress');
           $linkBtn.off('click');
 
           if (deferred.state() === 'pending') {
@@ -6131,7 +6017,7 @@
                    '<input class="note-image-input form-control" type="file" name="files" accept="image/*" multiple="multiple" />' +
                    imageLimitation +
                  '</div>' +
-                 '<div class="form-group note-group-image-url" style="overflow:auto;">' +
+                 '<div class="form-group" style="overflow:auto;">' +
                    '<label>' + lang.image.url + '</label>' +
                    '<input class="note-image-url form-control col-md-12" type="text" />' +
                  '</div>';
@@ -6309,13 +6195,13 @@
       var ytRegExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
       var ytMatch = url.match(ytRegExp);
 
-      var igRegExp = /(?:www\.|\/\/)instagram\.com\/p\/(.[a-zA-Z0-9_-]*)/;
+      var igRegExp = /\/\/instagram.com\/p\/(.[a-zA-Z0-9_-]*)/;
       var igMatch = url.match(igRegExp);
 
-      var vRegExp = /\/\/vine\.co\/v\/([a-zA-Z0-9]+)/;
+      var vRegExp = /\/\/vine.co\/v\/(.[a-zA-Z0-9]*)/;
       var vMatch = url.match(vRegExp);
 
-      var vimRegExp = /\/\/(player\.)?vimeo\.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/;
+      var vimRegExp = /\/\/(player.)?vimeo.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/;
       var vimMatch = url.match(vimRegExp);
 
       var dmRegExp = /.+dailymotion.com\/(video|hub)\/([^_]+)[^#]*(#video=([^_&]+))?/;
@@ -6343,7 +6229,7 @@
       } else if (igMatch && igMatch[0].length) {
         $video = $('<iframe>')
             .attr('frameborder', 0)
-            .attr('src', 'https://instagram.com/p/' + igMatch[1] + '/embed/')
+            .attr('src', igMatch[0] + '/embed/')
             .attr('width', '612').attr('height', '710')
             .attr('scrolling', 'no')
             .attr('allowtransparency', 'true');
@@ -6470,9 +6356,9 @@
 
       var body = [
         '<p class="text-center">',
-        '<a href="http://summernote.org/" target="_blank">Summernote 0.8.2</a> · ',
-        '<a href="https://github.com/summernote/summernote" target="_blank">Project</a> · ',
-        '<a href="https://github.com/summernote/summernote/issues" target="_blank">Issues</a>',
+        '<a href="//summernote.org/" target="_blank">Summernote 0.8.1</a> · ',
+        '<a href="//github.com/summernote/summernote" target="_blank">Project</a> · ',
+        '<a href="//github.com/summernote/summernote/issues" target="_blank">Issues</a>',
         '</p>'
       ].join('');
 
@@ -6815,9 +6701,8 @@
 
 
   $.summernote = $.extend($.summernote, {
-    version: '0.8.2',
+    version: '0.8.1',
     ui: ui,
-    dom: dom,
 
     plugins: {},
 
@@ -6938,6 +6823,7 @@
         onEnter: null,
         onKeyup: null,
         onKeydown: null,
+        onSubmit: null,
         onImageUpload: null,
         onImageUploadError: null
       },

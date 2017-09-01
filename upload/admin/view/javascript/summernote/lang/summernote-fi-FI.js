@@ -49,7 +49,7 @@
       },
       style: {
         style: 'Tyyli',
-        p: 'Normaali',
+        normal: 'Normaali',
         blockquote: 'Lainaus',
         pre: 'Koodi',
         h1: 'Otsikko 1',

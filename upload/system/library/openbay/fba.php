@@ -1,11 +1,9 @@
 <?php
 namespace openbay;
 
-final class fba {
+class fba {
 	private $api_key;
 	private $api_account_id;
-    private $encryption_key;
-    private $encryption_iv;
 	private $url = 'https://api.openbaypro.io/';
 	private $registry;
 
@@ -36,33 +34,12 @@ final class fba {
 		$this->api_account_id = $this->config->get('openbay_fba_api_account_id');
 		$this->logging = $this->config->get('openbay_fba_debug_log');
 
-		$this->setEncryptionKey($this->config->get('openbay_fba_encryption_key'));
-		$this->setEncryptionIv($this->config->get('openbay_fba_encryption_iv'));
-
-		if ($this->logging == 1) {
-			$this->setLogger();
-		}
+		$this->setLogger();
 	}
 
 	public function __get($name) {
 		return $this->registry->get($name);
 	}
-
-    public function getEncryptionKey() {
-        return $this->encryption_key;
-    }
-
-	public function setEncryptionKey($key) {
-	    $this->encryption_key = $key;
-    }
-
-    public function getEncryptionIv() {
-        return $this->encryption_iv;
-    }
-
-    public function setEncryptionIv($encryption_iv) {
-        $this->encryption_iv = $encryption_iv;
-    }
 
 	public function setApiKey($api_key) {
 		$this->api_key = $api_key;
@@ -77,13 +54,11 @@ final class fba {
 
 		$headers = array();
 		$headers[] = 'X-Auth-Token: ' . $this->api_key;
+		$headers[] = 'Content-Type: application/json';
 		$headers[] = 'X-Account-ID: ' . $this->api_account_id;
-        $headers[] = 'X-Endpoint-Version: 2';
-        $headers[] = 'Content-Type: application/json';
 
 		$defaults = array(
-            CURLOPT_HEADER      	=> 0,
-            CURLOPT_HTTPHEADER      => $headers,
+			CURLOPT_HTTPHEADER      => $headers,
 			CURLOPT_URL             => $this->url . $uri,
 			CURLOPT_USERAGENT       => 'OpenBay Pro for Fulfillment by Amazon',
 			CURLOPT_FRESH_CONNECT   => 1,
@@ -108,18 +83,18 @@ final class fba {
 			$defaults[CURLOPT_CUSTOMREQUEST] = "GET";
 		}
 
-		$curl = curl_init();
+		$ch = curl_init();
 
-		curl_setopt_array($curl, $defaults);
+		curl_setopt_array($ch, $defaults);
 
-		$result = curl_exec($curl);
+		$result = curl_exec($ch);
 
 		if (!$result) {
-			$this->log('call() - Curl Failed ' . curl_error($curl) . ' ' . curl_errno($curl));
+			$this->log('call() - Curl Failed ' . curl_error($ch) . ' ' . curl_errno($ch));
 
-			$response = array('error' => true, 'error_messages' => array(curl_error($curl) . ' ' . curl_errno($curl)), 'body' => null, 'response_http' => 0);
+			$response = array('error' => true, 'error_messages' => array(curl_error($ch) . ' ' . curl_errno($ch)), 'body' => null, 'response_http' => 0);
 		} else {
-			$http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 			$this->log("Response: " . $http_code . " : " . strlen($result) . " bytes");
 
@@ -150,7 +125,7 @@ final class fba {
 			}
 		}
 
-		curl_close($curl);
+		curl_close($ch);
 
 		return $response;
 	}
@@ -160,7 +135,7 @@ final class fba {
 	}
 
 	public function validate() {
-		if ($this->config->get('openbay_fba_api_account_id') && $this->config->get('openbay_fba_api_key') && $this->config->get('openbay_fba_encryption_key') && $this->config->get('openbay_fba_encryption_iv')) {
+		if ($this->config->get('openbay_fba_api_key') && $this->config->get('openbay_fba_api_account_id')) {
 			return true;
 		} else {
 			return false;
@@ -178,12 +153,12 @@ final class fba {
 	}
 
 	public function log($data) {
-		if ($this->logging == 1) {
-            if (function_exists('getmypid')) {
-                $process_id = getmypid();
-                $data = $process_id . ' - ' . $data;
-            }
+		if (function_exists('getmypid')) {
+			$process_id = getmypid();
+			$data = $process_id . ' - ' . $data;
+		}
 
+		if ($this->logging == 1) {
 			$this->logger->write($data);
 		}
 	}

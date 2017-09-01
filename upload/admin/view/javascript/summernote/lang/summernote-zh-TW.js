@@ -57,7 +57,7 @@
       },
       style: {
         style: '樣式',
-        p: '一般',
+        normal: '一般',
         blockquote: '引用區塊',
         pre: '程式碼區塊',
         h1: '標題 1',

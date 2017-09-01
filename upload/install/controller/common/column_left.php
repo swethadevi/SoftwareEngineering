@@ -1,7 +1,7 @@
 <?php
 class ControllerCommonColumnLeft extends Controller {
 	public function index() {
-		$this->load->language('common/column_left');
+		$this->language->load('common/column_left');
 	
 		// Step
 		$data['text_license'] = $this->language->get('text_license');
@@ -31,10 +31,7 @@ class ControllerCommonColumnLeft extends Controller {
 		$languages = glob(DIR_LANGUAGE . '*', GLOB_ONLYDIR);
 		
 		foreach ($languages as $language) {
-			$data['languages'][] = array(
-				'text'  => $this->language->get('text_' . basename($language)),
-				'value' => basename($language)
-			);
+			$data['languages'][] = basename($language);
 		}
 
 		if (!isset($this->request->get['route'])) {

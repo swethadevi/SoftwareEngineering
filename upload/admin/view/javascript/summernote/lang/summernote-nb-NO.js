@@ -49,7 +49,7 @@
       },
       style: {
         style: 'Stil',
-        p: 'p',
+        normal: 'Normal',
         blockquote: 'Sitat',
         pre: 'Kode',
         h1: 'Overskrift 1',

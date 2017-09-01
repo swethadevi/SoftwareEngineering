@@ -1,0 +1,159 @@
+<modification>
+    <name>Testimonial by Plaza Themes</name>
+	<version>1.0</version>
+	<link>http://www.plazathemes.com/</link>
+	<author>Plaza Theme</author>
+	<code>testimonial</code>
+
+	<file path="admin/controller/common/column_left.php">
+		<operation>
+			<search><![CDATA[if ($this->user->hasPermission('access', 'catalog/recurring')) {]]></search>
+			<add position="before"><![CDATA[
+				$this->load->language('catalog/octestimonial');
+
+				if ($this->user->hasPermission('access', 'catalog/octestimonial')) {
+					$catalog[] = array(
+						'name'	   => $this->language->get('text_testimonial'),
+						'href'     => $this->url->link('catalog/octestimonial', 'token=' . $this->session->data['token'], true),
+						'children' => array()
+					);
+				}
+			]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/controller/extension/theme/theme_default.php">
+		<operation>
+			<search><![CDATA[$this->load->language('extension/theme/theme_default');]]></search>
+			<add position="before"><![CDATA[
+				$this->load->language('catalog/octestimonial');
+			]]></add>
+		</operation>
+
+		<operation>
+			<search><![CDATA[$data['text_product'] = $this->language->get('text_product');]]></search>
+			<add position="before"><![CDATA[
+				$data['text_testimonial'] = $this->language->get('text_testimonial');
+			]]></add>
+		</operation>
+
+		<operation>
+			<search><![CDATA[$data['entry_product_limit'] = $this->language->get('entry_product_limit');]]></search>
+			<add position="before"><![CDATA[
+				$data['entry_testimonial_limit'] = $this->language->get('entry_testimonial_limit');
+				$data['entry_testimonial_image'] = $this->language->get('entry_testimonial_image');
+			]]></add>
+		</operation>
+
+		<operation>
+            <search><![CDATA[if (isset($this->error['image_related'])) {]]></search>
+            <add position="before">
+                <![CDATA[
+                    if (isset($this->error['image_testimonial'])) {
+                        $data['error_image_testimonial'] = $this->error['image_testimonial'];
+                    } else {
+                        $data['error_image_testimonial'] = '';
+                    }
+
+                    if (isset($this->error['testimonial_limit'])) {
+						$data['error_testimonial_limit'] = $this->error['testimonial_limit'];
+					} else {
+						$data['error_testimonial_limit'] = '';
+					}
+                ]]>
+            </add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[if (isset($this->request->post['theme_default_image_related_width'])) {]]></search>
+            <add position="before">
+                <![CDATA[
+	                if (isset($this->request->post['theme_default_testimonial_limit'])) {
+						$data['theme_default_testimonial_limit'] = $this->request->post['theme_default_testimonial_limit'];
+					} elseif (isset($setting_info['theme_default_testimonial_limit'])) {
+						$data['theme_default_testimonial_limit'] = $setting_info['theme_default_testimonial_limit'];
+					} else {
+						$data['theme_default_testimonial_limit'] = 15;
+					}
+
+					if (isset($this->request->post['theme_default_image_testimonial_width'])) {
+						$data['theme_default_image_testimonial_width'] = $this->request->post['theme_default_image_testimonial_width'];
+					} elseif (isset($setting_info['theme_default_image_testimonial_width'])) {
+						$data['theme_default_image_testimonial_width'] = $this->config->get('theme_default_image_testimonial_width');
+					} else {
+						$data['theme_default_image_testimonial_width'] = 100;
+					}
+
+					if (isset($this->request->post['theme_default_image_testimonial_height'])) {
+						$data['theme_default_image_testimonial_height'] = $this->request->post['theme_default_image_testimonial_height'];
+					} elseif (isset($setting_info['theme_default_image_testimonial_height'])) {
+						$data['theme_default_image_testimonial_height'] = $this->config->get('theme_default_image_testimonial_height');
+					} else {
+						$data['theme_default_image_testimonial_height'] = 100;
+					}
+                ]]>
+            </add>
+        </operation>
+
+        <operation>
+            <search><![CDATA[if (!$this->request->post['theme_default_image_related_width'] || !$this->request->post['theme_default_image_related_height']) {]]></search>
+            <add position="before">
+                <![CDATA[
+                	if (!$this->request->post['theme_default_testimonial_limit']) {
+                        $this->error['testimonial_limit'] = $this->language->get('error_testimonial_limit');
+                    }
+
+                    if (!$this->request->post['theme_default_image_testimonial_width'] || !$this->request->post['theme_default_image_testimonial_height']) {
+                        $this->error['image_testimonial'] = $this->language->get('error_image_testimonial');
+                    }
+                ]]>
+            </add>
+        </operation>
+	</file>
+
+	<file path="admin/view/template/extension/theme/theme_default.tpl">
+		<operation>
+            <search><![CDATA[<legend><?php echo $text_product; ?></legend>]]></search>
+			<add position="before">
+                <![CDATA[
+                	<legend><?php echo $text_testimonial; ?></legend>
+                	<div class="form-group required">
+		              <label class="col-sm-2 control-label" for="input-testimonial-limit"><?php echo $entry_testimonial_limit; ?></label>
+		              <div class="col-sm-10">
+		                <input type="text" name="theme_default_testimonial_limit" value="<?php echo $theme_default_testimonial_limit; ?>" placeholder="<?php echo $entry_testimonial_limit; ?>" id="input-testimonial-limit" class="form-control" />
+		                <?php if ($error_testimonial_limit) { ?>
+		                <div class="text-danger"><?php echo $error_testimonial_limit; ?></div>
+		                <?php } ?>
+		              </div>
+		            </div>
+	            </fieldset>
+          		<fieldset>
+                ]]>
+            </add>
+		</operation>
+
+        <operation>
+            <search><![CDATA[<label class="col-sm-2 control-label" for="input-image-related"><?php echo $entry_image_related; ?></label>]]></search>
+            <add position="before">
+                <![CDATA[
+                    <label class="col-sm-2 control-label" for="input-image-testimonial"><?php echo $entry_testimonial_image; ?></label>
+                    <div class="col-sm-10">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <input type="text" name="theme_default_image_testimonial_width" value="<?php echo $theme_default_image_testimonial_width; ?>" placeholder="<?php echo $entry_width; ?>" id="input-image-testimonial" class="form-control" />
+                        </div>
+                        <div class="col-sm-6">
+                          <input type="text" name="theme_default_image_testimonial_height" value="<?php echo $theme_default_image_testimonial_height; ?>" placeholder="<?php echo $entry_height; ?>" class="form-control" />
+                        </div>
+                      </div>
+                      <?php if ($error_image_testimonial) { ?>
+                      <div class="text-danger"><?php echo $error_image_testimonial; ?></div>
+                      <?php } ?>
+                    </div>
+                  </div>
+                  <div class="form-group required">
+                ]]>
+            </add>
+        </operation>
+    </file>
+</modification>

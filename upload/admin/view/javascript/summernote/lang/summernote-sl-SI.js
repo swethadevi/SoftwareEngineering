@@ -51,7 +51,7 @@
       },
       style: {
         style: 'Slogi',
-        p: 'Navadno besedilo',
+        normal: 'Navadno besedilo',
         blockquote: 'Citat',
         pre: 'Koda',
         h1: 'Naslov 1',

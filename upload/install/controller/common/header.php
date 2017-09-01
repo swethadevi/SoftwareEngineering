@@ -1,7 +1,7 @@
 <?php
 class ControllerCommonHeader extends Controller {
 	public function index() {
-		$this->load->language('common/header');
+		$this->language->load('common/header');
 		
 		$data['title'] = $this->document->getTitle();
 		$data['description'] = $this->document->getDescription();

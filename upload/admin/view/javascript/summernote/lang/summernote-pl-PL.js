@@ -37,7 +37,7 @@
         videoLink: 'Adres wideo',
         insert: 'Wstaw wideo',
         url: 'Adres wideo',
-        providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion lub Youku)'
+        providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion, lub Youku)'
       },
       link: {
         link: 'Odnośnik',
@@ -56,7 +56,7 @@
       },
       style: {
         style: 'Style',
-        p: 'pny',
+        normal: 'Normalny',
         blockquote: 'Cytat',
         pre: 'Kod',
         h1: 'Nagłówek 1',
